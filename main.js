@@ -1,52 +1,63 @@
-let game = document.querySelector("html");
-game.addEventListener("keydown", changeDirection);
+const gameArea = document.querySelector("#game");
+const ctx = gameArea.getContext("2d");
+const squareSize = 20;
+const width = 960;
+const height = 600;
+const xIntervals = 46;  // 960 / 20 - 2 for padding
+const yIntervals = 28;  // 600 / 20 - 2 for padding
+let length = 1;
+let snake = [{x:0, y:0}];
+let mice;
 
-let snakeHead = document.querySelector("#snake");
-console.log(snakeHead);
+// console.log(ctx);
 
-let snake = {
-  direction: "not moving",
-  head: {
-    top: 0,
-    left: 0
-  }
+const drawSnakeBody = (x, y) => {
+  ctx.fillStyle = "#CCCB69";
+  ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 }
 
-let snakeSize = 20;
+const drawMice = (x, y) => {
+  ctx.fillStyle = "#FF6362";
+  ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+}
 
+const createMice = () => {
+  mice = {
+    x: Math.floor((Math.random() * xIntervals) + 1),
+    y: Math.floor((Math.random() * yIntervals) + 1)
+  }
 
-document.querySelector("button").addEventListener("click", startGame);
+  snake.forEach((node) => {
+    let snakeX = node.x;
+    let snakeY = node.y;
 
-function startGame()
-{
+    if (mice.x === snakeX || mice.y === snakeY || mice.x === snakeX && mice.y === snakeY) {
+      mice.x = Math.floor((Math.random() * xIntervals) + 1);
+      mice.y = Math.floor((Math.random() * yIntervals) + 1);
+    }
+  });
+}
+
+const paint = () => {
+  ctx.fillStyle = '#5C90B2';
+  ctx.fillRect(0, 0, width, height);
+
+  let snakeX = snake[0].x;
+  let snakeY = snake[0].y;
+
+  snake.forEach(node => {
+    drawSnakeBody(node.x, node.y);
+  });
+
+  createMice();
+  console.log(`(${mice.x},${mice.y})`);
+  drawMice(mice.x, mice.y);
+}
+
+const startBtn = document.querySelector("button");
+startBtn.addEventListener("click", function() {
   console.log("Game started");
-  document.querySelector("#instructions").style.display = "none";
-}
+  this.setAttribute("disabled", true);
+});
 
-function changeDirection(event)
-{
-  let keyCode = event.key;
-  switch (keyCode)
-  {
-    case "ArrowRight": snake.direction = "right";
-      break;
-    case "ArrowLeft": snake.direction = "left";
-      break;
-    case "ArrowUp": snake.direction = "up";
-      break;
-    case "ArrowDown": snake.direction = "down";
-      break;
-    default: break;
-  }
-  move(snake.direction);
-}
-
-function move(direction) {
-  if (direction === "right") {
-    snake.head.left += 25;
-    snakeHead.style.left = snake.head.left + "px";
-    console.log(snakeHead.style.left);
-  } else {
-    console.log("nothing");
-  }
-}
+paint();
