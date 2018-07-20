@@ -1,24 +1,39 @@
 const gameArea = document.querySelector("#game");
-const startBtn = document.querySelector("button");
 const ctx = gameArea.getContext("2d");
+const startBtn = document.querySelector("button");
+const lengthText = document.querySelector("#length")
 const squareSize = 20;
 const width = 960;
 const height = 600;
 const xIntervals = 46;  // 960 / 20 - 2 for padding
 const yIntervals = 28;  // 600 / 20 - 2 for padding
 
-let length = 1;
+let length;
 let direction;
-let snake = [{x:0, y:0}];
+let snake;
 let mice;
+let isRunning;
 
-startBtn.addEventListener("click", function() {
+const setupGame = function() {
+  snake = [{x:0, y:0}];
+  direction = "";
+  length = 1;
+  createMice();
+  updateLengthText();
+  startBtn.addEventListener("click", startGame);
+  paint();
+}
+
+const startGame = function() {
   this.setAttribute("disabled", true);
-  startGame();
-});
+  document.addEventListener("keydown", handleInput);
+  runGame = setInterval(paint, 80);
+}
 
-document.onkeydown = event => {
-  let key = event.key;
+function handleInput() {
+  let key = window.event.key;
+  isRunning = true;
+
   switch(key) {
     case "ArrowRight":
       if (direction !== "left") {
@@ -44,18 +59,11 @@ document.onkeydown = event => {
   }
 }
 
-const setupGame = function() {
-  createMice();
-  paint();
-}
-
-const startGame = function() {
-  runGame = setInterval(paint, 80);
-}
-
 const drawSnakeBody = (x, y) => {
   ctx.fillStyle = "#CCCB69";
+  ctx.strokeStyle = "#888745";
   ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+  ctx.strokeRect(x * squareSize, y * squareSize, squareSize, squareSize);
 }
 
 const collidedWithWalls = (x, y) => {
@@ -64,12 +72,14 @@ const collidedWithWalls = (x, y) => {
   return false;
 }
 
-const collidedWithSelf = (x, y, snake) => {
-  snake.forEach(node => {
-    if (node.x === x && node.y === y) {
-      return true;
-    }
-  });
+const collidedWithSelf = (x, y) => {
+  if (isRunning) {
+    for (let i = 0; i < snake.length; i++) {
+      if (snake[i].x === x && snake[i].y === y) {
+        return true;
+      }
+    };
+  }
   return false;
 }
 
@@ -97,10 +107,12 @@ const createMice = () => {
 const drawMice = (x, y) => {
   ctx.fillStyle = "#FF6362";
   ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+  ctx.strokeStyle = "#8d3333";
+  ctx.strokeRect(x * squareSize, y * squareSize, squareSize, squareSize);
 }
 
-const lengthText = () => {
-  let text = "Length: " + length;
+const updateLengthText = () => {
+  lengthText.innerText = length;
 }
 
 const paint = () => {
@@ -112,22 +124,20 @@ const paint = () => {
 
   if (direction === "right") {
     snakeX++;
-    // console.log(`(${snakeX},${snakeY})`);
   } else if (direction === "left") {
     snakeX--;
-    // console.log(`(${snakeX},${snakeY})`);
   } else if (direction === "up") {
     snakeY--;
-    // console.log(`(${snakeX},${snakeY})`);
   } else if (direction === "down") {
     snakeY++;
-    // console.log(`(${snakeX},${snakeY})`);
   }
 
-  if (collidedWithWalls(snakeX, snakeY) || collidedWithSelf(snakeX, snakeY, snake)) {
+  if (collidedWithWalls(snakeX, snakeY) || collidedWithSelf(snakeX, snakeY)) {
+    isRunning = false;
     startBtn.removeAttribute("disabled");
-    ctx.clearRect(0, 0, width, height);
     clearInterval(runGame);
+    document.removeEventListener("keydown", handleInput);
+    setupGame();
     return;
   }
 
@@ -138,6 +148,7 @@ const paint = () => {
       y: snakeY
     };
     length++;
+    updateLengthText();
     createMice();
   } else {
     tail = snake.pop();
@@ -152,8 +163,6 @@ const paint = () => {
   });
 
   drawMice(mice.x, mice.y);
-
-  lengthText();
 }
 
-setupGame();
+window.document.onload = setupGame();

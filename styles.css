@@ -27,54 +27,30 @@ button {
 }
 
 #instructions {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.25);
   color: white;
-  text-align: center;
-  max-width: 400px;
-  padding: 25px;
+  text-align: left;
+  padding: 15px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  vertical-align: middle;
 }
 
-#instructions > h1 {
+#instructions > h2 {
+  text-align: center;
   margin-bottom: 20px;
+}
+
+#instructions > p {
+  font-size: 1.3em;
+  padding: 5px;
 }
 
 button {
   margin-top: 15px;
   padding: 5px;
-  font-size: 1em;
+  font-size: 2em;
 }
-
-#snake {
-  width: 10px;
-  height: 0px;
-  background-color: #CCCB69;
-  position: absolute;
-}
-
-.food {
-  width: 25px;
-  height: 25px;
-  background-color: #FF6362;
-}
-
-ul {
-  list-style-type: none;
-  text-align: center;
-}
-
-ul li {
-  display: inline;
-  margin-right: 20px;
-}
-
-.float-right {
-  float: right;
-}
-
-/* #container > p {
-  float: right;
-} */
